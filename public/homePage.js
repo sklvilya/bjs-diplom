@@ -41,7 +41,7 @@ money.addMoneyCallback = (data) => {
 money.conversionMoneyCallback = (data) => {
     ApiConnector.convertMoney(data, (response) => {
         if (response.success) {
-            ProfileWidget.showProfile(response, data);
+            ProfileWidget.showProfile(response.data);
             money.setMessage(response.success, `${data.fromAmount} ${data.fromCurrency} конвертированы в ${data.targetCurrency}`);
         } else {
             money.setMessage(response.success, response.error);
@@ -55,7 +55,7 @@ money.sendMoneyCallback = (data) => {
         console.log(data, response);
         if (response.success) {
             ProfileWidget.showProfile(response.data);
-            money.setMessage(response.success, `${data.amount} ${data.currency} переведен пользователю № ${data}`);
+            money.setMessage(response.success, `${data.amount} ${data.currency} переведен пользователю № ${data.to}`);
         } else {
             money.setMessage(response.success, response.error);
         }
@@ -64,7 +64,6 @@ money.sendMoneyCallback = (data) => {
 
 
 let favorites = new FavoritesWidget();
-
 ApiConnector.getFavorites((response) => {
     if (response.success) {
         favorites.clearTable();
@@ -86,3 +85,17 @@ favorites.addUserCallback = (data) => {
         }
     })
 };
+
+
+favorites.removeUserCallback = (data) => {
+    ApiConnector.removeUserFromFavorites(data, (response) => {
+        if (response.success) {
+            favorites.clearTable();
+            favorites.fillTable(response.data);
+            money.updateUsersList(response.data);
+            favorites.setMessage(response.success, `Пользователь №${data} удален`)
+        } else {
+            favorites.setMessage(response.success, response.error);
+        }
+    })
+}
